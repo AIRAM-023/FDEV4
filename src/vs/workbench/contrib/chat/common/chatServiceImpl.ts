@@ -54,6 +54,7 @@ type ChatProviderInvokedEvent = {
 	chatSessionId: string;
 	agent: string;
 	agentExtensionId: string | undefined;
+	agentExtensionIsPublished: boolean;
 	slashCommand: string | undefined;
 	location: ChatAgentLocation;
 	citations: number;
@@ -70,6 +71,7 @@ type ChatProviderInvokedClassification = {
 	chatSessionId: { classification: 'SystemMetaData'; purpose: 'FeatureInsight'; comment: 'A random ID for the session.' };
 	agent: { classification: 'SystemMetaData'; purpose: 'FeatureInsight'; comment: 'The type of agent used.' };
 	agentExtensionId: { classification: 'SystemMetaData'; purpose: 'FeatureInsight'; comment: 'The extension that contributed the agent.' };
+	agentExtensionIsPublished: { classification: 'SystemMetaData'; purpose: 'FeatureInsight'; comment: 'Whether the extension that contributed the agent is published to the Marketplace.' };
 	slashCommand?: { classification: 'SystemMetaData'; purpose: 'FeatureInsight'; comment: 'The type of slashCommand used.' };
 	location: { classification: 'SystemMetaData'; purpose: 'FeatureInsight'; comment: 'The location at which chat request was made.' };
 	citations: { classification: 'SystemMetaData'; purpose: 'FeatureInsight'; comment: 'The number of public code citations that were returned with the response.' };
@@ -586,6 +588,7 @@ export class ChatService extends Disposable implements IChatService {
 					requestType,
 					agent: agentPart?.agent.id ?? '',
 					agentExtensionId: agentPart?.agent.extensionId.value ?? '',
+					agentExtensionIsPublished: agentPart?.agent.extensionPublished ?? false,
 					slashCommand: agentSlashCommandPart ? agentSlashCommandPart.command.name : commandPart?.slashCommand.command,
 					chatSessionId: model.sessionId,
 					location,
@@ -708,6 +711,7 @@ export class ChatService extends Disposable implements IChatService {
 						requestType,
 						agent: agentPart?.agent.id ?? '',
 						agentExtensionId: agentPart?.agent.extensionId.value ?? '',
+						agentExtensionIsPublished: agentPart?.agent.extensionPublished ?? false,
 						slashCommand: commandForTelemetry,
 						chatSessionId: model.sessionId,
 						enableCommandDetection,
@@ -742,6 +746,7 @@ export class ChatService extends Disposable implements IChatService {
 					requestType,
 					agent: agentPart?.agent.id ?? '',
 					agentExtensionId: agentPart?.agent.extensionId.value ?? '',
+					agentExtensionIsPublished: agentPart?.agent.extensionPublished ?? false,
 					slashCommand: agentSlashCommandPart ? agentSlashCommandPart.command.name : commandPart?.slashCommand.command,
 					chatSessionId: model.sessionId,
 					location,
