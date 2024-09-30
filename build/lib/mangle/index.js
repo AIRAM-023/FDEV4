@@ -356,6 +356,11 @@ class Mangler {
             minWorkers: 'max'
         });
     }
+    dispose() {
+        this.renameWorkerPool.terminate();
+        this.allClassDataByKey.clear();
+        this.allExportedSymbols.clear();
+    }
     async computeNewFileContents(strictImplicitPublicHandling) {
         const service = ts.createLanguageService(new staticLanguageServiceHost_1.StaticLanguageServiceHost(this.projectPath));
         // STEP:
