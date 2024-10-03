@@ -322,6 +322,7 @@ export class View extends ViewEventHandler {
 			viewDomNode: this.domNode.domNode,
 			linesContentDomNode: this._linesContent.domNode,
 			viewLinesDomNode: this._viewLines.getDomNode().domNode,
+			viewLinesGpu: this._viewLinesGpu,
 
 			focusTextArea: () => {
 				this.focus();
@@ -340,6 +341,7 @@ export class View extends ViewEventHandler {
 				this.render(true, false);
 			},
 			shouldSuppressMouseDownOnViewZone: (viewZoneId: string) => {
+				// TODO: Defer to viewLinesGpu?
 				return this._viewZones.shouldSuppressMouseDownOnViewZone(viewZoneId);
 			},
 			shouldSuppressMouseDownOnWidget: (widgetId: string) => {
@@ -347,16 +349,19 @@ export class View extends ViewEventHandler {
 			},
 			getPositionFromDOMInfo: (spanNode: HTMLElement, offset: number) => {
 				this._flushAccumulatedAndRenderNow();
+				// TODO: Defer to viewLinesGpu?
 				return this._viewLines.getPositionFromDOMInfo(spanNode, offset);
 			},
 
 			visibleRangeForPosition: (lineNumber: number, column: number) => {
 				this._flushAccumulatedAndRenderNow();
-				return this._viewLines.visibleRangeForPosition(new Position(lineNumber, column));
+				const position = new Position(lineNumber, column);
+				return this._viewLines.visibleRangeForPosition(position) ?? this._viewLinesGpu?.visibleRangeForPosition(position) ?? null;
 			},
 
 			getLineWidth: (lineNumber: number) => {
 				this._flushAccumulatedAndRenderNow();
+				// TODO: Defer to viewLinesGpu?
 				return this._viewLines.getLineWidth(lineNumber);
 			}
 		};
