@@ -755,14 +755,12 @@ export class ChatInputPart extends Disposable implements IHistoryNavigationWidge
 
 				let buffer: Uint8Array;
 				try {
+					this.attachButtonAndDisposables(widget, index, attachment, hoverDelegate);
 					if (attachment.value instanceof URI) {
-						this.attachButtonAndDisposables(widget, index, attachment, hoverDelegate);
 						const readFile = await this.fileService.readFile(attachment.value);
 						buffer = readFile.value.buffer;
-
 					} else {
 						buffer = attachment.value as Uint8Array;
-						this.attachButtonAndDisposables(widget, index, attachment, hoverDelegate);
 					}
 					this.createImageElements(buffer, widget, hoverElement);
 				} catch (error) {
@@ -834,7 +832,6 @@ export class ChatInputPart extends Disposable implements IHistoryNavigationWidge
 	private createImageElements(buffer: ArrayBuffer | Uint8Array, widget: HTMLElement, hoverElement: HTMLElement) {
 		const blob = new Blob([buffer], { type: 'image/png' });
 		const url = URL.createObjectURL(blob);
-		const img = dom.$('img.chat-attached-context-image', { src: url, alt: '' });
 		const pillImg = dom.$('img.chat-attached-context-pill-image', { src: url, alt: '' });
 		const pill = dom.$('div.chat-attached-context-pill', {}, pillImg);
 
@@ -843,8 +840,14 @@ export class ChatInputPart extends Disposable implements IHistoryNavigationWidge
 			existingPill.replaceWith(pill);
 		}
 
+		const hoverImage = dom.$('img.chat-attached-context-image', { src: url, alt: '' });
+
 		// Update hover image
-		hoverElement.appendChild(img);
+		hoverElement.appendChild(hoverImage);
+
+		hoverImage.onload = () => {
+			URL.revokeObjectURL(url);
+		};
 	}
 
 	async renderChatEditingSessionState(chatEditingSession: IChatEditingSession | null, initialState?: boolean, chatWidget?: IChatWidget) {
